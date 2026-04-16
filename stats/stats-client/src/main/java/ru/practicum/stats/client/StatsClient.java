@@ -27,7 +27,8 @@ public class StatsClient {
     @Value("${stats-server.url:http://localhost:9090}")
     private String serverUrl;
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
     public void saveHit(EndpointHit hit) {
         String url = serverUrl + "/hit";
