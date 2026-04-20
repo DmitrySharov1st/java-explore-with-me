@@ -11,8 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.dto.ViewStats;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,12 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class StatsClient {
-
     private final RestTemplate restTemplate;
-
     @Value("${stats-server.url:http://localhost:9090}")
     private String serverUrl;
-
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
@@ -39,24 +34,25 @@ public class StatsClient {
     }
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        String startEncoded = URLEncoder.encode(start.format(FORMATTER), StandardCharsets.UTF_8);
-        String endEncoded = URLEncoder.encode(end.format(FORMATTER), StandardCharsets.UTF_8);
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
-                .queryParam("start", startEncoded)
-                .queryParam("end", endEncoded);
-        if (uris != null && !uris.isEmpty()) {
-            for (String uri : uris) {
-                builder.queryParam("uris", uri);
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                    .queryParam("start", start.format(FORMATTER))
+                    .queryParam("end", end.format(FORMATTER));
+            if (uris != null && !uris.isEmpty()) {
+                for (String uri : uris) {
+                    builder.queryParam("uris", uri);
+                }
             }
+            if (unique != null) {
+                builder.queryParam("unique", unique);
+            }
+            String url = builder.build().toUriString();
+            ResponseEntity<List<ViewStats>> response = restTemplate.exchange(
+                    url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Failed to get stats from stats-server: {}", e.getMessage());
+            return List.of(); // возвращаем пустой список, чтобы основной сервис не падал
         }
-        if (unique != null) {
-            builder.queryParam("unique", unique);
-        }
-        String url = builder.build().toUriString();
-
-        ResponseEntity<List<ViewStats>> response = restTemplate.exchange(
-                url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        return response.getBody();
     }
 }
