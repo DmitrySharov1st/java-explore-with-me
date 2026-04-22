@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/admin/compilations")
 @RequiredArgsConstructor
 public class AdminCompilationController {
+    private static final String COMPILATION_ID_PATH = "/{compId}";
+
     private final CompilationService compilationService;
 
     @PostMapping
@@ -21,13 +23,13 @@ public class AdminCompilationController {
         return compilationService.addCompilation(newCompilationDto);
     }
 
-    @DeleteMapping("/{compId}")
+    @DeleteMapping(COMPILATION_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(@PathVariable Long compId) {
         compilationService.deleteCompilation(compId);
     }
 
-    @PatchMapping("/{compId}")
+    @PatchMapping(COMPILATION_ID_PATH)
     public CompilationDto updateCompilation(@PathVariable Long compId,
                                             @Valid @RequestBody UpdateCompilationRequest updateRequest) {
         return compilationService.updateCompilation(compId, updateRequest);

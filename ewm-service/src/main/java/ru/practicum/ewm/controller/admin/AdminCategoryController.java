@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/admin/categories")
 @RequiredArgsConstructor
 public class AdminCategoryController {
+    private static final String CATEGORY_ID_PATH = "/{catId}";
+
     private final CategoryService categoryService;
 
     @PostMapping
@@ -20,13 +22,13 @@ public class AdminCategoryController {
         return categoryService.addCategory(newCategoryDto);
     }
 
-    @DeleteMapping("/{catId}")
+    @DeleteMapping(CATEGORY_ID_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
         categoryService.deleteCategory(catId);
     }
 
-    @PatchMapping("/{catId}")
+    @PatchMapping(CATEGORY_ID_PATH)
     public CategoryDto updateCategory(@PathVariable Long catId, @Valid @RequestBody CategoryDto categoryDto) {
         return categoryService.updateCategory(catId, categoryDto);
     }

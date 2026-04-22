@@ -12,6 +12,9 @@ import java.util.List;
 @RequestMapping("/users/{userId}/events")
 @RequiredArgsConstructor
 public class PrivateEventController {
+    private static final String EVENT_ID_PATH = "/{eventId}";
+    private static final String EVENT_REQUESTS_PATH = "/{eventId}/requests";
+
     private final EventService eventService;
 
     @GetMapping
@@ -27,23 +30,23 @@ public class PrivateEventController {
         return eventService.addEvent(userId, newEventDto);
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping(EVENT_ID_PATH)
     public EventFullDto getUserEvent(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.getUserEventById(userId, eventId);
     }
 
-    @PatchMapping("/{eventId}")
+    @PatchMapping(EVENT_ID_PATH)
     public EventFullDto updateUserEvent(@PathVariable Long userId, @PathVariable Long eventId,
                                         @Valid @RequestBody UpdateEventUserRequest updateRequest) {
         return eventService.updateUserEvent(userId, eventId, updateRequest);
     }
 
-    @GetMapping("/{eventId}/requests")
+    @GetMapping(EVENT_REQUESTS_PATH)
     public List<ParticipationRequestDto> getEventRequests(@PathVariable Long userId, @PathVariable Long eventId) {
         return eventService.getEventRequestsByOwner(userId, eventId);
     }
 
-    @PatchMapping("/{eventId}/requests")
+    @PatchMapping(EVENT_REQUESTS_PATH)
     public EventRequestStatusUpdateResult updateRequestStatus(@PathVariable Long userId, @PathVariable Long eventId,
                                                               @Valid @RequestBody EventRequestStatusUpdateRequest requestUpdate) {
         return eventService.updateRequestStatus(userId, eventId, requestUpdate);
