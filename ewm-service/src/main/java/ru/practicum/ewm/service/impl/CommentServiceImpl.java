@@ -32,9 +32,9 @@ public class CommentServiceImpl implements CommentService {
     // Публичное получение одобренных комментариев
     @Override
     public List<CommentDto> getEventComments(Long eventId, int from, int size) {
-        // проверяем существование события (можно не проверять, но для консистентности)
         eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Event with id=%d was not found", eventId)));
         PageRequest page = PageRequest.of(from / size, size);
         return commentRepository.findByEventIdAndStatus(eventId, CommentStatus.APPROVED, page)
                 .stream()
